@@ -21,6 +21,15 @@ class MultiHeadSelfAttention(nn.Module):
         causal_mask = torch.tril(torch.ones(max_seq_len, max_seq_len)).bool()
         self.register_buffer("causal_mask", causal_mask, persistent=False)
 
+    def forward(self, x):
+        # batch, sequence length, and d_model
+        B, T, C = x.shape
+
+        # (B, T, 3*C)
+        qkv = self.qkv_proj(x)
+        # each (B, T, C)
+        q, k, v = qkv.split(self.d_model, dim=-1)
+
 class MLP(nn.Module):
     def __init__(self, d_model, expansion=4, dropout=0.0):
         super().__init__()
