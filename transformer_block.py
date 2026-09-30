@@ -30,6 +30,25 @@ class MultiHeadSelfAttention(nn.Module):
         # each (B, T, C)
         q, k, v = qkv.split(self.d_model, dim=-1)
 
+        # splitting d_model into different attention heads
+        q = q.view(B, T, self.n_heads, self.d_head).transpose(1, 2)
+        k = k.view(B, T, self.n_heads, self.d_head).transpose(1, 2)
+        v = v.view(B, T, self.n_heads, self.d_head).transpose(1, 2)
+
+        # scaled dot-product attention
+        attn_scores = (q @ k.transpose(-2, -1)) / math.sqrt(self.d_head)
+
+        # apply causal mask
+        attn_scores = attn_scores.masked_fill(-self.causal_mask[:T, :T], float('-inf'))
+
+        attn_weights = F.softmax(attn_scores, dim=-1)
+        attn_weights = self.dropout(attn_weights)
+        out = attn_weights @ v
+
+        # merge heads back into (B, T, C)
+        out = out.transpose(1, 2). continguous().view(B, T, C)
+        return self.out_proj(out)
+
 class MLP(nn.Module):
     def __init__(self, d_model, expansion=4, dropout=0.0):
         super().__init__()
