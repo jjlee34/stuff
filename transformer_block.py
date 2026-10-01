@@ -53,8 +53,14 @@ class MLP(nn.Module):
     def __init__(self, d_model, expansion=4, dropout=0.0):
         super().__init__()
         d_hidden = expansion * d_model
-        
-    pass
+        self.net = nn.Sequential(
+            nn.Linear(d_model, d_hidden),
+            nn.GELU(),
+            nn.Linear(d_hidden, d_model),
+            nn.Dropout(dropout)
+        )
+    def forward(self, x):
+        return self.net(x)
 
 class TransformerBlock(nn.Module):
     def __init__(self, d_model_ n_heads, max_seq_len=1024, dropout=0.0):
@@ -63,4 +69,6 @@ class TransformerBlock(nn.Module):
         self.attn = MultiHeadSelfAttention(d_model, n_heads, max_seq_len, dropout)
         self.ln2 = nn.LayerNorm(d_model)
         self.mlp = MLP(d_model, dropout=dropout)
-    pass
+    def forward(self, x):
+        x = x + self.attn(self.ln1(x))
+        x = x + self.mlp(self.ln2(x))
