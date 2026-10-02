@@ -70,5 +70,10 @@ class TransformerBlock(nn.Module):
         self.ln2 = nn.LayerNorm(d_model)
         self.mlp = MLP(d_model, dropout=dropout)
     def forward(self, x):
+        # pre-norm and residual to normalize before the sublayer
         x = x + self.attn(self.ln1(x))
         x = x + self.mlp(self.ln2(x))
+        return x
+
+if __name__ == "__main__":
+    pass
