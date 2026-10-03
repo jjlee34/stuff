@@ -76,4 +76,5 @@ class TransformerBlock(nn.Module):
         return x
 
 if __name__ == "__main__":
-    pass
+    torch.manual_seed(0)
+    B, T, d_model, n_heads = 2, 16, 256, 8
