@@ -63,7 +63,7 @@ class MLP(nn.Module):
         return self.net(x)
 
 class TransformerBlock(nn.Module):
-    def __init__(self, d_model_ n_heads, max_seq_len=1024, dropout=0.0):
+    def __init__(self, d_model_, n_heads, max_seq_len=1024, dropout=0.0):
         super().__init__()
         self.ln1 = nn.LayerNorm(d_model)
         self.attn = MultiHeadSelfAttention(d_model, n_heads, max_seq_len, dropout)
@@ -78,3 +78,10 @@ class TransformerBlock(nn.Module):
 if __name__ == "__main__":
     torch.manual_seed(0)
     B, T, d_model, n_heads = 2, 16, 256, 8
+
+    block = TransformerBlock(d_model, n_heads, max_seq_len=T)
+    x = torch.randn(B, T, d_model)
+    out = block(x)
+
+    print("input shape: ", x.shape)
+    print("output shape: ", out.shape)
