@@ -6,7 +6,18 @@ GPT2_SPLIT_PATTERN = re.compile(
     r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
 )
 
-# turns the text into list of byte-tuples
+# pre-processing: turns the text into list of byte-tuples
 def pretokenize(text):
     chunks = re.findall(GPT2_SPLIT_PATTERN, text)
     return [tuple(chunks.encode("utf-8")) for chunk in chunks]
+
+# pre-processing: calculates pair counts using chunk frequency; simple version
+def get_pair_counts(chunk_freq):
+    pair_counts = Counter()
+    for chunk, freq in chunk_freq.items():
+        for i in range(len(chunk) - 1):
+            pair_counts[(chunk[i], chunk[i + 1])] += freq
+    return pair_counts
+
+def merge_pair(chunk, pair, new_id):
+    merged = []
