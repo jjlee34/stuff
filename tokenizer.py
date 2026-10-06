@@ -21,3 +21,7 @@ def get_pair_counts(chunk_freq):
 
 def merge_pair(chunk, pair, new_id):
     merged = []
+    i = 0
+    while i < len(chunk):
+        if i < len(chunk) - 1 and (chunk[i], chunk[i + 1]) == pair:
+            merged.append(new_id)
